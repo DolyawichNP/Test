@@ -12,28 +12,22 @@
     <canvas id="c"></canvas>
     <div id="note">
       <h1>Interactive 3D Airflow Simulator</h1>
-      <p>
-        CFD-inspired preliminary airflow simulator สำหรับดูแนวโน้มลมและอุณหภูมิแบบ realtime
-        ไม่ใช่ CFD ที่รับรองงานวิศวกรรม จนกว่าจะผ่าน mesh independence, validation, calibration และวิศวกรรับรอง
-      </p>
+      <p>CFD-inspired preliminary airflow simulator สำหรับดูแนวโน้มลมและอุณหภูมิแบบ realtime ไม่ใช่ CFD ที่รับรองงานวิศวกรรม จนกว่าจะผ่าน mesh independence, validation, calibration และวิศวกรรับรอง</p>
     </div>
     <div id="legend">
       <span class="pill"><span class="dot air"></span>Air</span>
       <span class="pill"><span class="dot fan"></span>Fan</span>
       <span class="pill"><span class="dot door"></span>Door</span>
       <span class="pill"><span class="dot window"></span>Window</span>
-      <span class="pill">ลาก Object เพื่อย้ายตำแหน่ง</span>
-      <span class="pill">Mouse: หมุน / ซูม / เลื่อน</span>
+      <span class="pill">Mouse mode: ย้าย / หมุน Object</span>
+      <span class="pill">Mouse: หมุนกล้อง / ซูม / เลื่อน</span>
     </div>
   </main>
 
   <aside id="side">
     <section class="box warning">
       <h2>CFD / Engineering status</h2>
-      <p class="help">
-        สถานะปัจจุบัน: <b>Preliminary CFD-inspired model</b> ใช้ประเมินแนวโน้มเท่านั้น ยังไม่ใช่ผลรับรองงานวิศวกรรม
-        การทำ CFD รับรองจริงต้องใช้ solver/mesh/validation report และวิศวกรตรวจรับ
-      </p>
+      <p class="help">สถานะปัจจุบัน: <b>Preliminary CFD-inspired model</b> ใช้ประเมินแนวโน้มเท่านั้น ยังไม่ใช่ผลรับรองงานวิศวกรรม การทำ CFD รับรองจริงต้องใช้ solver/mesh/validation report และวิศวกรตรวจรับ</p>
       <div class="metric"><span>Certification readiness</span><span class="val bad">Not certified</span></div>
     </section>
 
@@ -46,63 +40,43 @@
         <button id="centerRoom">Center room</button>
         <button id="exportPdf">Export PDF</button>
       </div>
-      <div class="g2">
+      <div class="g2 row">
         <div><label>ความเร็ว simulation</label><input id="speed" type="number" min="0.1" step="0.1" value="8" required></div>
         <div><label>จำนวน particle</label><input id="npart" type="number" min="80" max="1200" step="20" value="420" required></div>
       </div>
+      <div class="row">
+        <label>Mouse mode สำหรับ Object</label>
+        <select id="mouseMode">
+          <option value="move">ย้ายตำแหน่ง Object</option>
+          <option value="rotate">หมุน Object / ปรับ Yaw</option>
+        </select>
+      </div>
+      <p class="help">เลือกโหมด “หมุน Object” แล้วลาก Air / Fan / Door / Window ใน 3D หรือแปลนห้องเพื่อปรับทิศทาง Yaw</p>
     </section>
 
     <section class="box">
       <h2>Preset / Save / Load</h2>
-      <div class="row">
-        <label>Preset ห้อง</label>
-        <select id="preset">
-          <option value="">-- เลือก preset --</option>
-          <option value="meeting">ห้องประชุม</option>
-          <option value="office">ห้องทำงาน</option>
-          <option value="bedroom">ห้องนอน</option>
-        </select>
-      </div>
-      <div class="actions row">
-        <button id="saveLocal">Save layout</button>
-        <button id="loadLocal">Load layout</button>
-        <button id="downloadJson">Download JSON</button>
-        <button id="loadJsonBtn">Load JSON</button>
-        <input id="loadJson" type="file" accept="application/json" hidden />
-      </div>
+      <div class="row"><label>Preset ห้อง</label><select id="preset"><option value="">-- เลือก preset --</option><option value="meeting">ห้องประชุม</option><option value="office">ห้องทำงาน</option><option value="bedroom">ห้องนอน</option></select></div>
+      <div class="actions row"><button id="saveLocal">Save layout</button><button id="loadLocal">Load layout</button><button id="downloadJson">Download JSON</button><button id="loadJsonBtn">Load JSON</button><input id="loadJson" type="file" accept="application/json" hidden /></div>
       <p class="help">Save layout จะเก็บไว้ใน Browser เครื่องนี้ ส่วน Download/Load JSON ใช้ย้าย layout ไปเครื่องอื่นได้</p>
     </section>
 
     <section class="box">
       <h2>แปลนห้องแบบลากวาง</h2>
       <svg id="planSvg" viewBox="0 0 360 240" role="img" aria-label="Top-down room plan"></svg>
-      <p class="help">ลากจุดสีในแปลนเพื่อจัดตำแหน่ง X/Z ได้ง่ายกว่าใส่พิกัด ตัวเลขในฟอร์มจะอัปเดตตามทันที</p>
+      <p class="help">โหมดย้าย = ลากเพื่อเปลี่ยน X/Z, โหมดหมุน = ลากออกจาก Object เพื่อเปลี่ยน Yaw</p>
     </section>
 
     <section class="box">
       <h2>ตัวแปรห้องและสิ่งแวดล้อม</h2>
-      <div class="g3 row">
-        <div><label>ยาว X (m)</label><input data-g="L" type="number" min="1" step="0.1" value="4" required></div>
-        <div><label>กว้าง Z (m)</label><input data-g="W" type="number" min="1" step="0.1" value="4" required></div>
-        <div><label>สูง Y (m)</label><input data-g="H" type="number" min="1" step="0.1" value="2.6" required></div>
-      </div>
-      <div class="g2 row">
-        <div><label>อุณหภูมิเริ่มต้น (°C)</label><input data-g="Tin0" type="number" step="0.1" value="31" required></div>
-        <div><label>อุณหภูมิภายนอก (°C)</label><input data-g="Tout" type="number" step="0.1" value="34" required></div>
-      </div>
-      <div class="g2 row">
-        <div><label>Heat load คน/อุปกรณ์/แดด (W)</label><input data-g="Qload" type="number" min="0" step="10" value="550" required></div>
-        <div><label>Thermal mass multiplier</label><input data-g="mass" type="number" min="1" step="1" value="12" required></div>
-      </div>
-      <div class="g2 row">
-        <div><label>ลมภายนอก (m/s)</label><input data-g="wind" type="number" min="0" step="0.1" value="1.2" required></div>
-        <div><label>Natural leakage ACH</label><input data-g="leak" type="number" min="0" step="0.05" value="0.25" required></div>
-      </div>
+      <div class="g3 row"><div><label>ยาว X (m)</label><input data-g="L" type="number" min="1" step="0.1" value="4" required></div><div><label>กว้าง Z (m)</label><input data-g="W" type="number" min="1" step="0.1" value="4" required></div><div><label>สูง Y (m)</label><input data-g="H" type="number" min="1" step="0.1" value="2.6" required></div></div>
+      <div class="g2 row"><div><label>อุณหภูมิเริ่มต้น (°C)</label><input data-g="Tin0" type="number" step="0.1" value="31" required></div><div><label>อุณหภูมิภายนอก (°C)</label><input data-g="Tout" type="number" step="0.1" value="34" required></div></div>
+      <div class="g2 row"><div><label>Heat load คน/อุปกรณ์/แดด (W)</label><input data-g="Qload" type="number" min="0" step="10" value="550" required></div><div><label>Thermal mass multiplier</label><input data-g="mass" type="number" min="1" step="1" value="12" required></div></div>
+      <div class="g2 row"><div><label>ลมภายนอก (m/s)</label><input data-g="wind" type="number" min="0" step="0.1" value="1.2" required></div><div><label>Natural leakage ACH</label><input data-g="leak" type="number" min="0" step="0.05" value="0.25" required></div></div>
       <p class="help">ค่าเริ่มต้นตั้งเป็น baseline ห้องใช้งานทั่วไปในไทย: ห้อง 4x4x2.6 m, ประตู 0.80x2.00 m, หน้าต่าง 1.20x1.10 m, แอร์ 12,000 BTU</p>
     </section>
 
     <section class="box"><h2>ผลคำนวณ</h2><div id="metrics"></div><details><summary>สูตรและข้อจำกัด</summary><div class="formula">dT/dt = (Q_heat + rho Cp Vdot_vent(T_out - T_room) - Q_AC) / (rho Volume Cp ThermalMass)<br><br>Airflow ใช้ vector field แบบ CFD-inspired heuristic จาก jet ของแอร์/พัดลม + ช่องเปิด + buoyancy ไม่ใช่ Navier-Stokes solver เต็มรูปแบบ</div></details></section>
-
     <section class="box"><h2>Air / เครื่องปรับอากาศ</h2><div id="acList"></div><button data-add="ac">+ เพิ่ม Air</button></section>
     <section class="box"><h2>Fan / พัดลม</h2><div id="fanList"></div><button data-add="fan">+ เพิ่ม Fan</button></section>
     <section class="box"><h2>Door / ประตู</h2><div id="doorList"></div><button data-add="door">+ เพิ่ม Door</button></section>
@@ -110,9 +84,7 @@
   </aside>
 </div>
 
-<script type="importmap">
-{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.166.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.166.1/examples/jsm/"}}
-</script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.166.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.166.1/examples/jsm/"}}</script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script type="module" src="script.js"></script>
 </body>
