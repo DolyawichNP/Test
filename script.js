@@ -174,13 +174,17 @@ function windowModel(d) {
 function fanModel(d) {
   const g = new THREE.Group();
   const color = deviceColor(d.type);
+  const floorOffset = Math.max(0.45, Number(d.y) || 1.2);
   const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.08, 24), new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: 0.22 }));
   hub.rotation.x = Math.PI / 2;
   const bladeMat = new THREE.MeshStandardMaterial({ color: 0xfde68a, roughness: 0.45 });
   for (let i = 0; i < 3; i++) { const blade = new THREE.Mesh(new THREE.BoxGeometry(0.52, 0.045, 0.018), bladeMat); blade.position.x = 0.25; blade.rotation.z = i * Math.PI * 2 / 3; g.add(blade); }
-  const stand = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.7, 0.035), new THREE.MeshStandardMaterial({ color: 0x94a3b8 }));
-  stand.position.y = -0.42;
-  g.add(hub, stand);
+  const poleHeight = Math.max(0.18, floorOffset - 0.18);
+  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, poleHeight, 16), new THREE.MeshStandardMaterial({ color: 0x94a3b8 }));
+  pole.position.y = -0.09 - poleHeight / 2;
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(0.23, 0.26, 0.06, 32), new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.55 }));
+  base.position.y = -floorOffset + 0.03;
+  g.add(hub, pole, base);
   g.rotation.y = faceRotationY(d.yaw);
   return g;
 }
@@ -298,7 +302,7 @@ function deviceCard(d, i) {
   if (d.type === 'fan') spec = `<div class="g3 row">${numInput(d, 'cfm', 'Airflow CFM', 50, 8000, 10)}${numInput(d, 'range', 'ระยะลม m', 0.5, 20, 0.5)}${numInput(d, 'radius', 'รัศมีลม m', 0.1, 5, 0.05)}</div>`;
   if (d.type === 'door' || d.type === 'window') spec = `<div class="g3 row">${numInput(d, 'width', 'กว้าง m', 0.1, 20, 0.1)}${numInput(d, 'height', 'สูง m', 0.1, 20, 0.1)}${numInput(d, 'cd', 'Cd', 0, 1, 0.01)}</div>`;
   const pitchOrOpen = (d.type === 'ac' || d.type === 'fan') ? numInput(d, 'pitch', 'Pitch °', -80, 80, 1) : numInput(d, 'open', 'เปิด %', 0, 100, 1);
-  return `<div class="dev ${d.id === state.selectedId ? 'selected' : ''}"><div class="devHead"><b>${d.type.toUpperCase()} #${i + 1}</b><span><label style="display:inline;color:#cbd5e1"><input data-id="${d.id}" data-k="on" type="checkbox" ${d.on ? 'checked' : ''}>เปิด</label> <button data-select="${d.id}">เลือก</button> <button data-del="${d.id}">ลบ</button></span></div><div class="g3 row">${numInput(d, 'x', 'X m', -50, 50, 0.1)}${numInput(d, 'y', 'Y m', 0, 50, 0.1)}${numInput(d, 'z', 'Z m', -50, 50, 0.1)}</div><div class="g2 row">${numInput(d, 'yaw', 'Yaw °', 0, 360, 1)}${pitchOrOpen}</div>${spec}<p class="help">Yaw คือทิศ Object. เลือก Mouse mode = หมุน Object แล้วลากใน 3D/แปลนเพื่อหมุนได้</p></div>`;
+  return `<div class="dev ${d.id === state.selectedId ? 'selected' : ''}"><div class="devHead"><b>${d.type.toUpperCase()} #${i + 1}</b><span><label style="display:inline;color:#cbd5e1"><input data-id="${d.id}" data-k="on" type="checkbox" ${d.on ? 'checked' : ''}>เปิด</label> <button data-select="${d.id}">เลือก</button> <button data-del="${d.id}">ลบ</button></span></div><div class="g3 row">${numInput(d, 'x', 'X m', -50, 50, 0.1)}${numInput(d, 'y', d.type === 'fan' ? 'Y ความสูงหัวพัดลม m' : 'Y m', 0, 50, 0.1)}${numInput(d, 'z', 'Z m', -50, 50, 0.1)}</div><div class="g2 row">${numInput(d, 'yaw', 'Yaw °', 0, 360, 1)}${pitchOrOpen}</div>${spec}<p class="help">Yaw คือทิศ Object. พัดลมใช้ Y เป็นความสูงหัวพัดลม ฐานจะวางบนพื้นอัตโนมัติ</p></div>`;
 }
 function renderLists() { ['ac', 'fan', 'door', 'window'].forEach(t => document.getElementById(t + 'List').innerHTML = state.dev[t].map(deviceCard).join('')); bindDeviceInputs(); }
 function bindDeviceInputs() {
