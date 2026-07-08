@@ -12,7 +12,7 @@ const state = {
   run: true,
   T: 31,
   selectedId: null,
-  g: { L: 6, W: 4, H: 2.7, Tin0: 31, Tout: 34, Qload: 450, mass: 12, wind: 1.2, leak: 0.25 },
+  g: { L: 4, W: 4, H: 2.6, Tin0: 31, Tout: 34, Qload: 550, mass: 12, wind: 1.2, leak: 0.25 },
   dev: { ac: [], fan: [], door: [], window: [] },
   met: {}
 };
@@ -45,10 +45,24 @@ const drag = { active: false, device: null, plane: new THREE.Plane(), offset: ne
 
 function makeDevice(type, overrides = {}) {
   const d = { id: 'd' + id++, type, on: true, x: 0, y: 1.3, z: 0, yaw: 0, pitch: 0 };
-  if (type === 'ac') Object.assign(d, { x: -2.4, y: 2.25, z: -1.5, yaw: 35, pitch: -12, btu: 12000, cfm: 420, target: 25, supply: 14, range: 5 });
-  if (type === 'fan') Object.assign(d, { x: 2, y: 1.2, z: 1, yaw: 220, pitch: 0, cfm: 900, range: 4, radius: 1.1 });
-  if (type === 'door') Object.assign(d, { x: 3, y: 1, z: 0, yaw: 180, open: 60, width: 0.9, height: 2, cd: 0.62 });
-  if (type === 'window') Object.assign(d, { x: 0, y: 1.35, z: -2, yaw: 90, open: 45, width: 1.2, height: 1, cd: 0.55 });
+  if (type === 'ac') Object.assign(d, {
+    x: -1.65,
+    y: 2.25,
+    z: -1.75,
+    yaw: 55,
+    pitch: -12,
+    btu: 12000,
+    cfm: 420,
+    target: 25,
+    supply: 14,
+    range: 4.5,
+    modelW: 0.9,
+    modelH: 0.3,
+    modelD: 0.22
+  });
+  if (type === 'fan') Object.assign(d, { x: 1.1, y: 1.2, z: 0.8, yaw: 220, pitch: 0, cfm: 900, range: 4, radius: 1.1 });
+  if (type === 'door') Object.assign(d, { x: 2, y: 1, z: 0.8, yaw: 180, open: 50, width: 0.8, height: 2, cd: 0.62 });
+  if (type === 'window') Object.assign(d, { x: 0, y: 1.35, z: -2, yaw: 90, open: 45, width: 1.2, height: 1.1, cd: 0.55 });
   return Object.assign(d, overrides);
 }
 
@@ -56,28 +70,28 @@ const presets = {
   meeting: {
     g: { L: 8, W: 5, H: 2.8, Tin0: 31, Tout: 34, Qload: 1400, mass: 18, wind: 1.1, leak: 0.35 },
     dev: {
-      ac: [makeDevice('ac', { x: -3.2, y: 2.45, z: -1.9, yaw: 25, btu: 18000, cfm: 620 }), makeDevice('ac', { x: 3.2, y: 2.45, z: -1.9, yaw: 155, btu: 18000, cfm: 620 })],
+      ac: [makeDevice('ac', { x: -3.2, y: 2.45, z: -1.9, yaw: 25, btu: 18000, cfm: 620, modelW: 1.05, modelH: 0.32, modelD: 0.24 }), makeDevice('ac', { x: 3.2, y: 2.45, z: -1.9, yaw: 155, btu: 18000, cfm: 620, modelW: 1.05, modelH: 0.32, modelD: 0.24 })],
       fan: [makeDevice('fan', { x: 0, y: 1.4, z: 0.8, yaw: 270, cfm: 1200 })],
-      door: [makeDevice('door', { x: 4, y: 1, z: 1.4, yaw: 180, open: 35 })],
-      window: [makeDevice('window', { x: -2.2, y: 1.4, z: -2.5, yaw: 90, open: 30 }), makeDevice('window', { x: 2.2, y: 1.4, z: -2.5, yaw: 90, open: 30 })]
+      door: [makeDevice('door', { x: 4, y: 1, z: 1.4, yaw: 180, open: 35, width: 0.9, height: 2 })],
+      window: [makeDevice('window', { x: -2.2, y: 1.4, z: -2.5, yaw: 90, open: 30, width: 1.5, height: 1.1 }), makeDevice('window', { x: 2.2, y: 1.4, z: -2.5, yaw: 90, open: 30, width: 1.5, height: 1.1 })]
     }
   },
   office: {
-    g: { L: 6, W: 4, H: 2.7, Tin0: 31, Tout: 34, Qload: 700, mass: 12, wind: 1.2, leak: 0.25 },
+    g: { L: 4, W: 4, H: 2.6, Tin0: 31, Tout: 34, Qload: 550, mass: 12, wind: 1.2, leak: 0.25 },
     dev: {
-      ac: [makeDevice('ac', { x: -2.4, y: 2.3, z: -1.5, yaw: 35, btu: 12000, cfm: 420 })],
-      fan: [makeDevice('fan', { x: 2, y: 1.2, z: 1, yaw: 220, cfm: 900 })],
-      door: [makeDevice('door', { x: 3, y: 1, z: 0, yaw: 180, open: 50 })],
-      window: [makeDevice('window', { x: 0, y: 1.35, z: -2, yaw: 90, open: 45 })]
+      ac: [makeDevice('ac', { x: -1.65, y: 2.25, z: -1.75, yaw: 55, btu: 12000, cfm: 420, modelW: 0.9, modelH: 0.3, modelD: 0.22 })],
+      fan: [makeDevice('fan', { x: 1.1, y: 1.2, z: 0.8, yaw: 220, cfm: 900 })],
+      door: [makeDevice('door', { x: 2, y: 1, z: 0.8, yaw: 180, open: 50, width: 0.8, height: 2 })],
+      window: [makeDevice('window', { x: 0, y: 1.35, z: -2, yaw: 90, open: 45, width: 1.2, height: 1.1 })]
     }
   },
   bedroom: {
     g: { L: 4.2, W: 3.4, H: 2.6, Tin0: 30, Tout: 33, Qload: 280, mass: 16, wind: 0.8, leak: 0.18 },
     dev: {
-      ac: [makeDevice('ac', { x: -1.7, y: 2.25, z: -1.25, yaw: 35, btu: 9000, cfm: 330, target: 25 })],
+      ac: [makeDevice('ac', { x: -1.7, y: 2.25, z: -1.25, yaw: 35, btu: 9000, cfm: 330, target: 25, modelW: 0.8, modelH: 0.28, modelD: 0.21 })],
       fan: [],
-      door: [makeDevice('door', { x: 2.1, y: 1, z: 1.1, yaw: 180, open: 20 })],
-      window: [makeDevice('window', { x: -1.2, y: 1.35, z: -1.7, yaw: 90, open: 20 })]
+      door: [makeDevice('door', { x: 2.1, y: 1, z: 1.1, yaw: 180, open: 20, width: 0.8, height: 2 })],
+      window: [makeDevice('window', { x: -1.2, y: 1.35, z: -1.7, yaw: 90, open: 20, width: 1.2, height: 1.1 })]
     }
   }
 };
@@ -108,6 +122,12 @@ function deviceColor(type) {
 }
 function colorCss(type) {
   return { ac: '#38bdf8', fan: '#fbbf24', door: '#34d399', window: '#a78bfa' }[type] || '#ffffff';
+}
+function faceRotationY(yaw) {
+  return Math.PI / 2 - THREE.MathUtils.degToRad(yaw || 0);
+}
+function attachDeviceId(obj, deviceId) {
+  obj.traverse(child => { child.userData.deviceId = deviceId; });
 }
 
 function centerRoom() {
@@ -159,22 +179,115 @@ function roundRect(c, x, y, w, h, r) {
   c.closePath();
 }
 
+function acModel(d) {
+  const g = new THREE.Group();
+  const w = d.modelW || 0.9;
+  const h = d.modelH || 0.3;
+  const dep = d.modelD || 0.22;
+  const body = new THREE.Mesh(
+    new THREE.BoxGeometry(w, h, dep),
+    new THREE.MeshStandardMaterial({ color: 0xe5eef7, roughness: 0.52 })
+  );
+  const grille = new THREE.Mesh(
+    new THREE.BoxGeometry(w * 0.86, h * 0.12, 0.012),
+    new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.6 })
+  );
+  grille.position.set(0, -h * 0.25, dep / 2 + 0.009);
+  const display = new THREE.Mesh(
+    new THREE.BoxGeometry(w * 0.18, h * 0.08, 0.014),
+    new THREE.MeshStandardMaterial({ color: 0x38bdf8, emissive: 0x0284c7, emissiveIntensity: 0.25 })
+  );
+  display.position.set(w * 0.27, h * 0.16, dep / 2 + 0.011);
+  g.add(body, grille, display);
+  g.rotation.y = faceRotationY(d.yaw);
+  return g;
+}
+
+function doorModel(d) {
+  const g = new THREE.Group();
+  const leaf = new THREE.Mesh(
+    new THREE.BoxGeometry(d.width || 0.8, d.height || 2, 0.055),
+    new THREE.MeshStandardMaterial({ color: 0x8b5a2b, roughness: 0.75 })
+  );
+  const frame = new THREE.LineSegments(
+    new THREE.EdgesGeometry(new THREE.BoxGeometry((d.width || 0.8) + 0.08, (d.height || 2) + 0.08, 0.065)),
+    new THREE.LineBasicMaterial({ color: 0xffedd5 })
+  );
+  const knob = new THREE.Mesh(
+    new THREE.SphereGeometry(0.045, 14, 10),
+    new THREE.MeshStandardMaterial({ color: 0xfbbf24, metalness: 0.25, roughness: 0.35 })
+  );
+  knob.position.set((d.width || 0.8) * 0.35, 0, 0.05);
+  g.add(leaf, frame, knob);
+  g.rotation.y = faceRotationY(d.yaw);
+  return g;
+}
+
+function windowModel(d) {
+  const g = new THREE.Group();
+  const w = d.width || 1.2;
+  const h = d.height || 1.1;
+  const pane = new THREE.Mesh(
+    new THREE.BoxGeometry(w, h, 0.035),
+    new THREE.MeshStandardMaterial({ color: 0x93c5fd, transparent: true, opacity: 0.35, roughness: 0.12 })
+  );
+  const frame = new THREE.LineSegments(
+    new THREE.EdgesGeometry(new THREE.BoxGeometry(w + 0.08, h + 0.08, 0.05)),
+    new THREE.LineBasicMaterial({ color: 0xe2e8f0 })
+  );
+  const mullionV = new THREE.Mesh(new THREE.BoxGeometry(0.035, h, 0.055), new THREE.MeshStandardMaterial({ color: 0xe2e8f0 }));
+  const mullionH = new THREE.Mesh(new THREE.BoxGeometry(w, 0.035, 0.055), new THREE.MeshStandardMaterial({ color: 0xe2e8f0 }));
+  g.add(pane, frame, mullionV, mullionH);
+  g.rotation.y = faceRotationY(d.yaw);
+  return g;
+}
+
+function fanModel(d) {
+  const g = new THREE.Group();
+  const color = deviceColor(d.type);
+  const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.08, 24), new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: 0.22 }));
+  hub.rotation.x = Math.PI / 2;
+  const bladeMat = new THREE.MeshStandardMaterial({ color: 0xfde68a, roughness: 0.45 });
+  for (let i = 0; i < 3; i++) {
+    const blade = new THREE.Mesh(new THREE.BoxGeometry(0.52, 0.045, 0.018), bladeMat);
+    blade.position.x = 0.25;
+    blade.rotation.z = i * Math.PI * 2 / 3;
+    g.add(blade);
+  }
+  const stand = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.7, 0.035), new THREE.MeshStandardMaterial({ color: 0x94a3b8 }));
+  stand.position.y = -0.42;
+  g.add(hub, stand);
+  g.rotation.y = faceRotationY(d.yaw);
+  return g;
+}
+
 function marker(d) {
   const group = new THREE.Group();
   group.userData.deviceId = d.id;
   group.userData.draggable = true;
   const color = deviceColor(d.type);
-  const mesh = new THREE.Mesh(new THREE.SphereGeometry(d.id === state.selectedId ? 0.17 : 0.13, 20, 12), new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: d.id === state.selectedId ? 0.65 : 0.25 }));
-  mesh.userData.deviceId = d.id;
-  group.add(mesh);
+  let model;
+  if (d.type === 'ac') model = acModel(d);
+  else if (d.type === 'door') model = doorModel(d);
+  else if (d.type === 'window') model = windowModel(d);
+  else model = fanModel(d);
+  attachDeviceId(model, d.id);
+  group.add(model);
+
+  const outline = new THREE.BoxHelper(model, d.id === state.selectedId ? 0xffffff : color);
+  outline.userData.deviceId = d.id;
+  group.add(outline);
+
   const arrow = new THREE.ArrowHelper(dir(d.yaw, d.pitch || 0), new THREE.Vector3(0, 0, 0), 0.75, color);
   arrow.userData.deviceId = d.id;
   group.add(arrow);
+
   const labelText = { ac: 'AIR', fan: 'FAN', door: 'DOOR', window: 'WIN' }[d.type];
   const labelBg = { ac: '#0284c7', fan: '#a16207', door: '#047857', window: '#7c3aed' }[d.type];
   const sprite = new THREE.Sprite(labelTexture(labelText, labelBg));
   sprite.scale.set(0.7, 0.35, 1);
-  sprite.position.y = 0.35;
+  const labelY = d.type === 'door' ? (d.height || 2) / 2 + 0.32 : d.type === 'window' ? (d.height || 1.1) / 2 + 0.25 : 0.45;
+  sprite.position.y = labelY;
   sprite.userData.deviceId = d.id;
   group.add(sprite);
   group.position.set(d.x, d.y, d.z);
@@ -318,7 +431,7 @@ function numInput(d, key, label, min, max, step) {
 }
 function deviceCard(d, i) {
   let spec = '';
-  if (d.type === 'ac') spec = `<div class="g2 row">${numInput(d, 'btu', 'BTU/hr', 1000, 100000, 500)}${numInput(d, 'cfm', 'Airflow CFM', 50, 3000, 10)}</div><div class="g3 row">${numInput(d, 'target', 'Target °C', 16, 35, 0.5)}${numInput(d, 'supply', 'Supply °C', 8, 25, 0.5)}${numInput(d, 'range', 'ระยะลม m', 0.5, 20, 0.5)}</div>`;
+  if (d.type === 'ac') spec = `<div class="g2 row">${numInput(d, 'btu', 'BTU/hr', 1000, 100000, 500)}${numInput(d, 'cfm', 'Airflow CFM', 50, 3000, 10)}</div><div class="g3 row">${numInput(d, 'target', 'Target °C', 16, 35, 0.5)}${numInput(d, 'supply', 'Supply °C', 8, 25, 0.5)}${numInput(d, 'range', 'ระยะลม m', 0.5, 20, 0.5)}</div><div class="g3 row">${numInput(d, 'modelW', 'กว้างตัวแอร์ m', 0.4, 2, 0.01)}${numInput(d, 'modelH', 'สูงตัวแอร์ m', 0.15, 0.7, 0.01)}${numInput(d, 'modelD', 'ลึกตัวแอร์ m', 0.1, 0.6, 0.01)}</div>`;
   if (d.type === 'fan') spec = `<div class="g3 row">${numInput(d, 'cfm', 'Airflow CFM', 50, 8000, 10)}${numInput(d, 'range', 'ระยะลม m', 0.5, 20, 0.5)}${numInput(d, 'radius', 'รัศมีลม m', 0.1, 5, 0.05)}</div>`;
   if (d.type === 'door' || d.type === 'window') spec = `<div class="g3 row">${numInput(d, 'width', 'กว้าง m', 0.1, 20, 0.1)}${numInput(d, 'height', 'สูง m', 0.1, 20, 0.1)}${numInput(d, 'cd', 'Cd', 0, 1, 0.01)}</div>`;
   const pitchOrOpen = (d.type === 'ac' || d.type === 'fan') ? numInput(d, 'pitch', 'Pitch °', -80, 80, 1) : numInput(d, 'open', 'เปิด %', 0, 100, 1);
@@ -438,7 +551,13 @@ function renderPlan() {
   }
   allDevices().forEach((d, idx) => {
     const p = toSvg(d);
-    html += `<circle class="plan-dot" data-plan-id="${d.id}" cx="${p.x}" cy="${p.y}" r="${d.id === state.selectedId ? 8 : 6}" fill="${colorCss(d.type)}"></circle>`;
+    const rectW = d.type === 'door' || d.type === 'window' ? Math.max(14, (d.width || 1) * scale) : Math.max(14, (d.modelW || 0.8) * scale);
+    const rectH = d.type === 'door' || d.type === 'window' ? 8 : 10;
+    if (d.type === 'ac' || d.type === 'door' || d.type === 'window') {
+      html += `<rect class="plan-dot" data-plan-id="${d.id}" x="${p.x - rectW / 2}" y="${p.y - rectH / 2}" width="${rectW}" height="${rectH}" rx="3" fill="${colorCss(d.type)}"></rect>`;
+    } else {
+      html += `<circle class="plan-dot" data-plan-id="${d.id}" cx="${p.x}" cy="${p.y}" r="${d.id === state.selectedId ? 8 : 6}" fill="${colorCss(d.type)}"></circle>`;
+    }
     html += `<text class="plan-label" x="${p.x}" y="${p.y - 11}">${d.type.toUpperCase()}${idx + 1}</text>`;
   });
   svg.innerHTML = html;
